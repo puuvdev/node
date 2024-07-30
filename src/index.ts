@@ -4,20 +4,7 @@ const port = process.env.PORT || 3000;
 
 import apiRouter from "./routes/apiRoutes";
 import mongoose from "mongoose";
-import { MessageProcessor } from "./workers/MessageProcessor";
-import PrivateConsumer from "./workers/PrivateConsumer";
 
-const messageProcessor = new MessageProcessor();
-const consumer = new PrivateConsumer(messageProcessor);
-
-async function runConsumer() {
-  try {
-    await consumer.startBatchConsumer();
-    console.log("Consumer started successfully.");
-  } catch (error) {
-    console.error("Error starting consumer:", error);
-  }
-}
 const MONGO_URI =
   process.env.MONGO_URI ||
   "mongodb+srv://posentegra:UBN7pDcp4hwgNinB@pentegra.vcv24.mongodb.net/pentegrav2";
