@@ -3,12 +3,14 @@ const api = express();
 const port = process.env.PORT || 8080;
 import cors from "cors";
 
-const corsOptions = {
-  origin: "*", // Replace with your client's origin
-  methods: ["GET", "POST", "PUT", "DELETE"], // Allowed methods
-  allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
-  credentials: true, // Allow cookies to be sent
-};
+api.use(
+  cors({
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true, // if you need to allow cookies with CORS
+  })
+);
 import apiRouter from "./routes/apiRoutes";
 import mongoose from "mongoose";
 
@@ -26,7 +28,7 @@ mongoose
 console.log("Connected to MongoDB");
 api.use(express.json());
 api.use("/api/", apiRouter);
-api.use(cors(corsOptions));
+
 api.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
 });
