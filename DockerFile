@@ -1,20 +1,20 @@
 FROM node:18-alpine
 
 # create work directory in app folder
-WORKDIR /app
+WORKDIR /code
 
 # install required packages for node image
 RUN apk --no-cache add openssh g++ make python3 git
 
 # copy over package.json files
-COPY package.json /app/
-COPY package-lock.json /app/
+COPY package.json /code/
+COPY package-lock.json /code/
 
 # install all depencies
 RUN npm install --save @rollup/rollup-linux-x64-musl && npm ci
 
 # copy over all files to the work directory
-ADD . /app
+ADD . /code
 
 # build the project
 RUN npm run build
