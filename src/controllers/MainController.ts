@@ -1,6 +1,5 @@
 // src/controllers/maianController.ts
 import { Request, Response } from "express";
-import Pos from "../models/Pos";
 import classRegistry from "./ClassRegistry";
 
 function findFirstNull(array: any[]): number | boolean {
@@ -18,27 +17,6 @@ export const main = async (req: Request, res: Response) => {
       console.log(body, process, cls, user, "params");
       const ClassRef = new classRegistry[cls]();
       if (ClassRef && typeof ClassRef[process] === "function") {
-        if (user) {
-          const pos = await Pos.findOne({ user });
-          if (!pos) {
-            return res.json("pos not found");
-          }
-          ClassRef.env = {
-            host: pos.host,
-            id: pos.id,
-            user: pos.user,
-            grant_type: "password",
-            username: pos.username,
-            password: pos.password,
-            client_id: pos.client_id,
-            client_secret: pos.client_secret,
-            refresh_token: pos.refresh_token,
-            access_token: pos.access_token,
-            expires_in: pos.expires_in,
-            expired_at: pos.expired_at,
-          };
-        }
-
         const paramKeys = ClassRef.methodParamsMap[process];
         if (paramKeys) {
           if (user) {
