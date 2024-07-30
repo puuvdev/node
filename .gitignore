@@ -1,0 +1,10 @@
+# Local Netlify folder
+
+node_modules
+dist
+id_rsa
+id_rsa.pub
+github_key
+bun.lockb
+ecosystem.config.js
+build_and_run.sh
