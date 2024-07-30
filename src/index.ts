@@ -1,19 +1,16 @@
 import express from "express";
 const api = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 
 import apiRouter from "./routes/apiRoutes";
 import mongoose from "mongoose";
 
 const MONGO_URI =
   process.env.MONGO_URI ||
-  "mongodb+srv://posentegra:UBN7pDcp4hwgNinB@pentegra.vcv24.mongodb.net/pentegrav2";
+  "mongodb://mongo:7f7c8b0ec3a9264da6de@78.135.107.15:2333/puuv_v1?authSource=admin";
 
 mongoose
-  .connect(MONGO_URI, {
-    // useNewUrlParser: true,
-    //useUnifiedTopology: true,
-  })
+  .connect(MONGO_URI, {})
   .then(() => {})
   .catch((error) => {
     console.error("Error connecting to MongoDB", error);

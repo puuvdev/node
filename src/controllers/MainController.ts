@@ -22,11 +22,13 @@ export const main = async (req: Request, res: Response) => {
           if (user) {
             body["user"] = user;
           }
+
           const params = paramKeys.map((key: string) => body[key]);
           const findExists = findFirstNull(params);
 
           if (findExists === false) {
             const result = await ClassRef[process].apply(ClassRef, params);
+            console.log(result, "result");
             return res.json(result);
           } else {
             if (typeof findExists === "number") {
