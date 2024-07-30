@@ -1,7 +1,7 @@
 {
   "name": "api",
   "scripts": {
-    "start": "node dist/index.js",
+    "start": "yarn dist/index.js",
     "dev": "npx nodemon --exec ts-node src/index.ts ",
     "build": "npx tsc"
   },
