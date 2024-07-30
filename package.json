@@ -1,12 +1,9 @@
 {
   "name": "api",
   "scripts": {
-    "start": "bun dist/index.js",
+    "start": "node dist/index.js",
     "dev": "npx nodemon --exec ts-node src/index.ts ",
-    "build": "bun tsc",
-    "consumer": "ts-node src/workers/RunPrivateSyncConsumer.ts",
-    "producer": "ts-node src/workers/Producer.ts",
-    "admin": "ts-node src/workers/Admin.ts"
+    "build": "npx tsc"
   },
   "devDependencies": {
     "@types/axios": "^0.14.0",
