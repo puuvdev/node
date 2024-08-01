@@ -2,7 +2,7 @@ import express, { Application, Request, Response, NextFunction } from "express";
 import * as dotenv from "dotenv";
 dotenv.config();
 const api = express();
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 8888;
 import cors, { CorsOptions } from "cors";
 const allowedOrigins = ["http://localhost:3001", "https://puuv.net"];
 
