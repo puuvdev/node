@@ -4,6 +4,22 @@ const port = process.env.PORT || 8080;
 import cors, { CorsOptions } from "cors";
 const allowedOrigins = ["http://localhost:3001", "https://puuv.net"];
 
+const corsOptionsDelegate = (
+  req: Request,
+  callback: (err: Error | null, options?: CorsOptions) => void
+) => {
+  let corsOptions: CorsOptions = { origin: false }; // Default to not allow
+  const origin = req.header("Origin");
+
+  if (origin && allowedOrigins.includes(origin)) {
+    corsOptions = { origin: true }; // Reflect (enable) the requested origin in the CORS response
+  }
+  console.log(origin, "origin");
+  callback(null, corsOptions); // Pass the options to the callback
+};
+
+// Use the CORS middleware with dynamic options
+api.use(cors(corsOptionsDelegate));
 import {
   authenticateJWT,
   authenticateWithToken,
