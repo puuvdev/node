@@ -20,9 +20,13 @@ const corsOptionsDelegate = (
 
 // Use the CORS middleware with dynamic options
 api.use(cors(corsOptionsDelegate));
-
+import {
+  authenticateJWT,
+  authenticateWithToken,
+} from "./middlewares/AuthMiddleware";
 import apiRouter from "./routes/apiRoutes";
 import mongoose from "mongoose";
+import { login, authWithToken } from "./controllers/AuthController";
 
 const MONGO_URI =
   process.env.MONGO_URI ||
@@ -37,23 +41,14 @@ mongoose
 
 console.log("Connected to MongoDB");
 api.use(express.json());
-api.use("/api/", apiRouter);
+api.use("/api/", authenticateWithToken, apiRouter);
+api.use("/user/", authenticateJWT, apiRouter);
+api.post("/login", login);
+api.post("/authWithToken", authWithToken);
 
+api.get("/status", async (req: Request, res: Response) => {
+  res.json({ success: true, git: "test" });
+});
 api.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
 });
-
-/*
-// Run the consumer
-runConsumer().catch((error) =>
-  console.error("Unhandled error in consumer:", error)
-);
-
-// Graceful shutdown on SIGINT (Ctrl+C)
-process.once("SIGINT", async () => {
-  console.log("Shutting down consumer...");
-  await consumer.shutdown();
-  console.log("Consumer shut down.");
-  process.exit(0);
-});
-*/

@@ -5,6 +5,26 @@ import bcrypt from "bcryptjs";
 import User from "../models/User";
 const SECRET_KEY = `Hw/WA."d}D@*ch4n`;
 
+export const authWithToken = async (req: Request, res: Response) => {
+  const { token }: { token: string } = req.body;
+
+  if (!token) {
+    return res.status(401).json({ message: "user not found", success: false });
+  }
+
+  const user = await User.findOne({
+    token,
+  });
+  if (!user) {
+    return res.status(401).json({ message: "user not found", success: false });
+  }
+
+  res.json({
+    success: true,
+    user,
+  });
+};
+
 export const login = async (req: Request, res: Response) => {
   try {
     const { email, password }: { email: string; password: string } = req.body;

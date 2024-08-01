@@ -9,6 +9,7 @@ function findFirstNull(array: any[]): number | boolean {
 
 export const main = async (req: Request, res: Response) => {
   try {
+    console.log("buraya gelmiyor ki");
     if (req.body) {
       let process = req.body.process ?? null;
       let body = req.body.body ?? null;
