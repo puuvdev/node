@@ -29,7 +29,7 @@ export const main = async (req: Request, res: Response) => {
 
           if (findExists === false) {
             const result = await ClassRef[process].apply(ClassRef, params);
-            console.log(result, "result");
+
             return res.json(result);
           } else {
             if (typeof findExists === "number") {
