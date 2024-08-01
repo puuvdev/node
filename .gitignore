@@ -8,3 +8,4 @@ github_key
 bun.lockb
 ecosystem.config.js
 build_and_run.sh
+.env
