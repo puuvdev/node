@@ -10,17 +10,17 @@ const corsOptionsDelegate = (
   req: Request,
   callback: (err: Error | null, options?: CorsOptions) => void
 ) => {
-  let corsOptions: CorsOptions = { origin: false }; // Default to not allow
+  let corsOptions: CorsOptions = { origin: false };
   const origin = req.header("Origin");
+  console.log(origin, "origin");
 
   if (origin && allowedOrigins.includes(origin)) {
-    corsOptions = { origin: true }; // Reflect (enable) the requested origin in the CORS response
+    corsOptions = { origin: true };
+    callback(null, corsOptions);
+  } else {
+    callback(new Error("zangir zungur"), corsOptions);
   }
-  console.log(origin, "origin");
-  callback(null, corsOptions); // Pass the options to the callback
 };
-
-// Use the CORS middleware with dynamic options
 
 import {
   authenticateJWT,
@@ -29,6 +29,7 @@ import {
 import apiRouter from "./routes/apiRoutes";
 import mongoose from "mongoose";
 import { login, authWithToken } from "./controllers/AuthController";
+import { error } from "console";
 
 const MONGO_URI = process.env.MONGO_URI;
 if (MONGO_URI) {
@@ -46,12 +47,10 @@ if (MONGO_URI) {
 }
 
 api.use(express.json());
-api.use("/api/", authenticateWithToken, apiRouter);
+api.use("/api/", [authenticateWithToken, cors(corsOptionsDelegate)], apiRouter);
 api.use("/user/", authenticateJWT, apiRouter);
 api.post("/login", login);
 api.post("/authWithToken", authWithToken);
-
-api.use(cors(corsOptionsDelegate));
 
 api.get("/status", async (req: Request, res: Response) => {
   res.json({ success: true, git: "test" });
