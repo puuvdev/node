@@ -45,7 +45,7 @@ if (MONGO_URI) {
     console.log(error, "try catch");
   }
 }
-
+api.use(cors(corsOptionsDelegate));
 api.use(express.json());
 api.use("/api/", [authenticateWithToken, cors(corsOptionsDelegate)], apiRouter);
 api.use("/user/", authenticateJWT, apiRouter);
