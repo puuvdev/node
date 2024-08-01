@@ -4,7 +4,7 @@ dotenv.config();
 const api = express();
 const port = process.env.PORT || 8888;
 import cors, { CorsOptions } from "cors";
-const allowedOrigins = ["http://localhost:3001", "https://puuv.net"];
+const allowedOrigins = ["https://canavar.net"];
 
 const corsOptionsDelegate = (
   req: Request,
