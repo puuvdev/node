@@ -2,7 +2,7 @@ import express, { Application, Request, Response, NextFunction } from "express";
 const api = express();
 const port = process.env.PORT || 8080;
 import cors, { CorsOptions } from "cors";
-const allowedOrigins = ["http://localhost:3000", "https://puuv.net"];
+const allowedOrigins = ["http://localhost:3001", "https://puuv.net"];
 
 const corsOptionsDelegate = (
   req: Request,
