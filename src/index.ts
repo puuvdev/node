@@ -16,9 +16,10 @@ const corsOptionsDelegate = (
 
   if (origin && allowedOrigins.includes(origin)) {
     corsOptions = { origin: true };
+    callback(null, corsOptions);
+  } else {
+    callback(new Error("zangir zungur"), corsOptions);
   }
-
-  callback(null, corsOptions);
 };
 
 import {
