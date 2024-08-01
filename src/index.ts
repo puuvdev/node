@@ -19,7 +19,7 @@ const corsOptionsDelegate = (
 };
 
 // Use the CORS middleware with dynamic options
-api.use(cors(corsOptionsDelegate));
+
 import {
   authenticateJWT,
   authenticateWithToken,
@@ -45,6 +45,8 @@ api.use("/api/", authenticateWithToken, apiRouter);
 api.use("/user/", authenticateJWT, apiRouter);
 api.post("/login", login);
 api.post("/authWithToken", authWithToken);
+
+api.use(cors(corsOptionsDelegate));
 
 api.get("/status", async (req: Request, res: Response) => {
   res.json({ success: true, git: "test" });
