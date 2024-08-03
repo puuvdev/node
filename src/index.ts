@@ -12,7 +12,7 @@ const corsOptionsDelegate = (
 ) => {
   let corsOptions: CorsOptions = { origin: false };
   const origin = req.header("Origin");
-  console.log(origin, "origin");
+  console.log(origin, req.headers, "origin");
 
   if (origin && allowedOrigins.includes(origin)) {
     corsOptions = { origin: true };
