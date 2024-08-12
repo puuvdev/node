@@ -5,12 +5,17 @@ import SubCategory from "../../models/SubCategory";
 import Product from "../../models/Product";
 import Page from "../../models/Page";
 import Component from "../../models/Component";
+import Menu from "../../models/Menu";
+import MenuItem, { MenuItemInterface } from "../../models/MenuItem";
 
 const asyncForeach = async (array: any, callback: any) => {
   for (const item of array) {
     await callback(item);
   }
 };
+interface NestedMenuItem extends MenuItemInterface {
+  subItems?: NestedMenuItem[];
+}
 
 class Api {
   public methodParamsMap: { [key: string]: string[] } = {
@@ -21,6 +26,7 @@ class Api {
     getVariants: ["ids"],
     getProductsById: ["ids"],
     getPage: ["slug"],
+    getPageMenu: ["slug"],
     getSubCategoryById: ["_id"],
     getComponents: [],
     getComponent: ["slug"],
@@ -44,6 +50,42 @@ class Api {
     const result = await Page.findOne({ slug });
 
     return result;
+  }
+  async getSubItems(parentId: any): Promise<NestedMenuItem[]> {
+    const subItems = await MenuItem.find({ ebeveyn: parentId }).limit(5).exec();
+
+    const nestedSubItems: NestedMenuItem[] = await Promise.all(
+      subItems.map(async (subItem: mongoose.Document & MenuItemInterface) => {
+        const children = await this.getSubItems(subItem._id);
+        return {
+          ...subItem.toObject(),
+          subItems: children,
+        } as NestedMenuItem;
+      })
+    );
+
+    return nestedSubItems;
+  }
+  async getPageMenu(slug: string) {
+    try {
+      const parentMenus = await MenuItem.find({ ebeveyn: null }).exec();
+
+      // Step 2: For each parent menu, fetch its nested sub-items
+      const menusWithSubItems = await Promise.all(
+        parentMenus.map(async (parent) => {
+          const subItems = await this.getSubItems(parent._id); // Get sub-items with nesting
+          return {
+            ...parent.toObject(),
+            subItems, // Attach the nested sub-items to the parent menu
+          };
+        })
+      );
+
+      return menusWithSubItems;
+    } catch (error) {
+      console.error("Error fetching menus with sub-items:", error);
+      throw error;
+    }
   }
   async setPage(slug: string, body: any) {
     const result = await Page.updateOne(
