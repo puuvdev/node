@@ -41,7 +41,7 @@ class Api {
     return result;
   }
   async getProduct(id: string) {
-    const result = await Product.findOne({ _id: id });
+    const result = await Product.findOne({ new_id: parseFloat(id) });
 
     return result;
   }
