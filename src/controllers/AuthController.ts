@@ -9,20 +9,37 @@ export const authWithToken = async (req: Request, res: Response) => {
   const { token }: { token: string } = req.body;
 
   if (!token) {
-    return res.status(401).json({ message: "user not found", success: false });
+    return res
+      .status(401)
+      .json({ message: "Token is required", success: false });
   }
 
-  const user = await User.findOne({
-    token,
-  });
-  if (!user) {
-    return res.status(401).json({ message: "user not found", success: false });
-  }
+  try {
+    // Verify the token and extract the payload
+    const decoded = jwt.verify(token, SECRET_KEY) as { id: string };
 
-  res.json({
-    success: true,
-    user,
-  });
+    // Find the user by ID extracted from the token
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      return res
+        .status(401)
+        .json({ message: "User not found", success: false });
+    }
+
+    // If the user is found, return the user data
+    res.json({
+      success: true,
+      user,
+    });
+  } catch (error) {
+    return res
+      .status(401)
+      .json({
+        message: "Invalid or expired token",
+        success: false,
+        expired: true,
+      });
+  }
 };
 
 export const login = async (req: Request, res: Response) => {
