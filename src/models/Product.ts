@@ -19,7 +19,7 @@ interface CategoryInterface {
 }
 
 // Define the interface for the Product document
-interface ProductInterface extends Document {
+export interface ProductInterface extends Document {
   title: string;
   providerId: number;
   category: CategoryInterface[];
