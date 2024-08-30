@@ -4,6 +4,7 @@ import User from "../../models/User";
 import UserFavorite from "../../models/UserFavorite";
 import Product from "../../models/Product";
 import UserAlarm from "../../models/UserAlarm";
+import UserNotification from "../../models/UserNotification";
 
 const SECRET_KEY = `Hw/WA."d}D@*ch4n`;
 
@@ -25,6 +26,10 @@ class Auth {
     getUserAlarmsByProduct: ["userId", "productId", "access_token"],
     updateAlarm: ["userId", "alarmId", "updateDetails", "access_token"],
     removeAlarm: ["userId", "alarmId", "access_token"],
+    getUserNotifications: ["userId", "access_token"],
+    markNotificationAsRead: ["userId", "notificationId", "access_token"],
+    addNotification: ["userId", "notificationDetails", "access_token"],
+    removeNotification: ["userId", "notificationId", "access_token"],
     isLogin: ["access_token"],
   };
 
@@ -268,6 +273,116 @@ class Auth {
     }
 
     return { message: "Alarm removed successfully", success: true };
+  }
+
+  async addNotification(
+    userId: string,
+    alarmId: string | null,
+    notificationDetails: { type: string; message: string },
+    access_token: string
+  ) {
+    const userIdFromToken = await this.verifyToken(access_token);
+
+    if (userId !== userIdFromToken) {
+      return { message: "Invalid user", success: false };
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return { message: "User not found", success: false };
+    }
+    if (alarmId) {
+      const alarm = await UserAlarm.findById(alarmId);
+      if (!alarm) {
+        return { message: "Alarm not found", success: false };
+      }
+    }
+
+    const newNotification = new UserNotification({
+      user: userId,
+      alarm: alarmId,
+      notification: { ...notificationDetails, isRead: false },
+    });
+    await newNotification.save();
+
+    return { message: "Notification added successfully", success: true };
+  }
+
+  // Function to retrieve all notifications for a user
+  async getUserNotifications(userId: string, access_token: string) {
+    const userIdFromToken = await this.verifyToken(access_token);
+
+    if (userId !== userIdFromToken) {
+      return { message: "Invalid user", success: false };
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return { message: "User not found", success: false };
+    }
+
+    const notifications = await UserNotification.find({ user: userId });
+    return {
+      success: true,
+      notifications,
+    };
+  }
+
+  // Function to mark a notification as read
+  async markNotificationAsRead(
+    userId: string,
+    notificationId: string,
+    access_token: string
+  ) {
+    const userIdFromToken = await this.verifyToken(access_token);
+
+    if (userId !== userIdFromToken) {
+      return { message: "Invalid user", success: false };
+    }
+
+    const updatedNotification = await UserNotification.findOneAndUpdate(
+      { _id: notificationId, user: userId },
+      { $set: { "notification.isRead": true } },
+      { new: true }
+    );
+
+    if (!updatedNotification) {
+      return {
+        message: "Notification not found or does not belong to user",
+        success: false,
+      };
+    }
+
+    return {
+      success: true,
+      notification: updatedNotification,
+    };
+  }
+
+  // Function to remove a notification
+  async removeNotification(
+    userId: string,
+    notificationId: string,
+    access_token: string
+  ) {
+    const userIdFromToken = await this.verifyToken(access_token);
+
+    if (userId !== userIdFromToken) {
+      return { message: "Invalid user", success: false };
+    }
+
+    const removedNotification = await UserNotification.findOneAndDelete({
+      _id: notificationId,
+      user: userId,
+    });
+    if (!removedNotification) {
+      return {
+        message: "Notification not found or does not belong to user",
+        success: false,
+      };
+    }
+
+    return { message: "Notification removed successfully", success: true };
   }
 }
 
