@@ -19,6 +19,8 @@ interface User {
 class Auth {
   public methodParamsMap: { [key: string]: string[] } = {
     getUserFavorites: ["userId", "access_token"],
+    checkFavoriteByProductId: ["userId", "productId", "access_token"],
+    checkAlarmByProductId: ["userId", "productId", "access_token"],
     addFavorite: ["userId", "productId", "access_token"],
     removeFavorite: ["userId", "productId", "access_token"],
     addAlarm: ["userId", "productId", "alarmDetails", "access_token"],
@@ -30,6 +32,7 @@ class Auth {
     markNotificationAsRead: ["userId", "notificationId", "access_token"],
     addNotification: ["userId", "notificationDetails", "access_token"],
     removeNotification: ["userId", "notificationId", "access_token"],
+    getUnreadNotificationCount: ["userId", "access_token"],
     isLogin: ["access_token"],
   };
 
@@ -104,6 +107,54 @@ class Auth {
     return {
       success: true,
       favorites: favorites.map((favorite) => favorite.product),
+    };
+  }
+  async checkFavoriteByProductId(
+    userId: string,
+    productId: string,
+    access_token: string
+  ) {
+    const userIdFromToken = await this.verifyToken(access_token);
+
+    if (userId !== userIdFromToken) {
+      return { message: "Invalid user", success: false };
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return { message: "User not found", success: false };
+    }
+
+    const favorite = await UserFavorite.findOne({
+      user: userId,
+      product: productId,
+    }).populate("product");
+    return {
+      success: true,
+      favorite,
+    };
+  }
+
+  async checkAlarmByProductId(
+    userId: string,
+    productId: string,
+    access_token: string
+  ) {
+    const userIdFromToken = await this.verifyToken(access_token);
+
+    if (userId !== userIdFromToken) {
+      return { message: "Invalid user", success: false };
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return { message: "User not found", success: false };
+    }
+
+    const alarm = await UserAlarm.findOne({ user: userId, product: productId });
+    return {
+      success: true,
+      alarm,
     };
   }
 
@@ -277,9 +328,9 @@ class Auth {
 
   async addNotification(
     userId: string,
-    alarmId: string | null,
     notificationDetails: { type: string; message: string },
-    access_token: string
+    access_token: string,
+    alarmId?: string | null
   ) {
     const userIdFromToken = await this.verifyToken(access_token);
 
@@ -383,6 +434,23 @@ class Auth {
     }
 
     return { message: "Notification removed successfully", success: true };
+  }
+  async getUnreadNotificationCount(userId: string, access_token: string) {
+    const userIdFromToken = await this.verifyToken(access_token);
+
+    if (userId !== userIdFromToken) {
+      return { message: "Invalid user", success: false };
+    }
+
+    const unreadCount = await UserNotification.countDocuments({
+      user: userId,
+      "notification.isRead": false,
+    });
+
+    return {
+      success: true,
+      unreadCount,
+    };
   }
 }
 

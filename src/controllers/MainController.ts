@@ -44,6 +44,6 @@ export const main = async (req: Request, res: Response) => {
       return res.json(process);
     }
   } catch (error) {
-    return res.status(401).json({ message: error });
+    return res.status(302).json({ message: error });
   }
 };

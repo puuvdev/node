@@ -30,6 +30,7 @@ export const authenticateWithToken = (
   next: NextFunction
 ) => {
   const token = req.header("Authorization")?.split(" ")[1];
+
   if (!token) return res.sendStatus(401); // Unauthorized if no token
 
   try {
