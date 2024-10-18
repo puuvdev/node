@@ -27,7 +27,7 @@ import {
 } from "./middlewares/AuthMiddleware";
 import apiRouter from "./routes/apiRoutes";
 import mongoose from "mongoose";
-import { login, authWithToken } from "./controllers/AuthController";
+import { login, register, authWithToken } from "./controllers/AuthController";
 import { error } from "console";
 
 const MONGO_URI = process.env.MONGO_URI;
@@ -49,6 +49,7 @@ api.use(express.json());
 api.use("/api/", [authenticateWithToken, cors(corsOptionsDelegate)], apiRouter);
 api.use("/user/", authenticateJWT, apiRouter);
 api.post("/login", login);
+api.post("/register", register);
 api.post("/authWithToken", authWithToken);
 
 api.get("/status", async (req: Request, res: Response) => {

@@ -32,13 +32,11 @@ export const authWithToken = async (req: Request, res: Response) => {
       user,
     });
   } catch (error) {
-    return res
-      .status(401)
-      .json({
-        message: "Invalid or expired token",
-        success: false,
-        expired: true,
-      });
+    return res.status(401).json({
+      message: "Invalid or expired token",
+      success: false,
+      expired: true,
+    });
   }
 };
 
@@ -69,5 +67,43 @@ export const login = async (req: Request, res: Response) => {
     });
   } catch (error) {
     return res.status(401).json({ message: "Invalid credentialsa" });
+  }
+};
+
+export const register = async (req: Request, res: Response) => {
+  try {
+    const { email, password }: { email: string; password: string } = req.body;
+
+    // Check if the user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res
+        .status(400)
+        .json({ message: "User already exists", success: false });
+    }
+
+    // Hash the password before saving the user
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create a new user
+    const newUser = new User({
+      email,
+      password: hashedPassword,
+    });
+
+    // Save the user to the database
+    await newUser.save();
+
+    // Generate a JWT token
+    const token = jwt.sign({ id: newUser.id }, SECRET_KEY, { expiresIn: "1h" });
+
+    // Return success response with user data and token
+    res.status(201).json({
+      success: true,
+      user: newUser,
+      token,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Server error", success: false });
   }
 };
