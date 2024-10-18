@@ -75,13 +75,13 @@ export const register = async (req: Request, res: Response) => {
     const {
       email,
       firstName,
-      surname,
+      lastName,
       password,
     }: {
       email: string;
       password: string;
       firstName: string;
-      surname: string;
+      lastName: string;
     } = req.body;
 
     // Check if the user already exists
@@ -100,7 +100,9 @@ export const register = async (req: Request, res: Response) => {
       email,
       password: hashedPassword,
       name: firstName,
-      surname: surname,
+      surname: lastName,
+      level: "user",
+      deviceId: "web",
     });
 
     // Save the user to the database
@@ -116,6 +118,7 @@ export const register = async (req: Request, res: Response) => {
       token,
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ message: "Server error", success: false });
   }
 };
