@@ -72,7 +72,17 @@ export const login = async (req: Request, res: Response) => {
 
 export const register = async (req: Request, res: Response) => {
   try {
-    const { email, password }: { email: string; password: string } = req.body;
+    const {
+      email,
+      firstName,
+      surname,
+      password,
+    }: {
+      email: string;
+      password: string;
+      firstName: string;
+      surname: string;
+    } = req.body;
 
     // Check if the user already exists
     const existingUser = await User.findOne({ email });
@@ -89,6 +99,8 @@ export const register = async (req: Request, res: Response) => {
     const newUser = new User({
       email,
       password: hashedPassword,
+      name: firstName,
+      surname: surname,
     });
 
     // Save the user to the database
