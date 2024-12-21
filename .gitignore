@@ -9,3 +9,4 @@ bun.lockb
 ecosystem.config.js
 build_and_run.sh
 .env
+.DS_Store

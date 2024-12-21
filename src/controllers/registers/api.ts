@@ -5,9 +5,17 @@ import SubCategory from "../../models/SubCategory";
 import Product from "../../models/Product";
 import Page from "../../models/Page";
 import Component from "../../models/Component";
-import Menu from "../../models/Menu";
 import MenuItem, { MenuItemInterface } from "../../models/MenuItem";
+import { Types } from "mongoose";
 
+export const stringToObjectId = (id: string): Types.ObjectId => {
+  console.log(id, "id");
+  if (Types.ObjectId.isValid(id)) {
+    return new Types.ObjectId(id);
+  } else {
+    throw new Error("Invalid ObjectId");
+  }
+};
 const asyncForeach = async (array: any, callback: any) => {
   for (const item of array) {
     await callback(item);
@@ -20,8 +28,11 @@ interface NestedMenuItem extends MenuItemInterface {
 class Api {
   public methodParamsMap: { [key: string]: string[] } = {
     getProductFilters: [],
+    getCategoryById: ["_id"],
     getCategory: ["category"],
+    getParentCategory: ["parent_id"],
     getSubCategory: ["category"],
+    getBreadcrumb: ["subcategoryId"],
     getProduct: ["id"],
     getVariants: ["ids"],
     getProductsById: ["ids"],
@@ -34,6 +45,38 @@ class Api {
     searchProduct: ["query"],
   };
   constructor() {}
+  async getBreadcrumb(
+    subcategoryId: string
+  ): Promise<{ name: string; slug: string }[]> {
+    const buildBreadcrumb = async (
+      currentId: string,
+      breadcrumb: { name: string; slug: string }[] = []
+    ): Promise<{ name: string; slug: string }[]> => {
+      const subCategory = await SubCategory.findOne({ _id: currentId });
+
+      if (subCategory) {
+        breadcrumb.unshift({ name: subCategory.name, slug: subCategory.slug });
+
+        if (subCategory.parent_id) {
+          return buildBreadcrumb(subCategory.parent_id, breadcrumb);
+        }
+      } else {
+        const category = await Category.findOne({ _id: currentId });
+
+        if (category) {
+          breadcrumb.unshift({ name: category.name, slug: category.slug });
+        }
+      }
+
+      return breadcrumb;
+    };
+
+    // Build the breadcrumb
+    const breadcrumb = await buildBreadcrumb(subcategoryId);
+
+    // Slice off the last element (remove the current subcategory)
+    return breadcrumb.slice(0, breadcrumb.length - 1);
+  }
 
   async getSubCategory(category: string) {
     const result = await SubCategory.findOne({ slug: category });
@@ -125,16 +168,32 @@ class Api {
 
     return result;
   }
+
   async getCategory(category: string) {
     const result = await Category.findOne({ slug: category });
 
     return result;
   }
+
   async getSubCategoryById(_id: mongoose.Types.ObjectId) {
     const result = await SubCategory.findOne({ _id });
 
     return result;
   }
+  async getCategoryById(_id: mongoose.Types.ObjectId) {
+    const result = await Category.findOne({ _id });
+
+    return result;
+  }
+
+  async getParentCategory(parent_id: string) {
+    const result = await SubCategory.find({ parent_id }).select(
+      "name slug total"
+    );
+
+    return result;
+  }
+
   async getProductFilters(sub_category_id: string) {
     try {
       const result = await CategoryFilter.findOne({ sub_category_id });
