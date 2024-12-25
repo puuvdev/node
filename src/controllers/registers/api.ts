@@ -41,6 +41,7 @@ class Api {
     getSubCategoryById: ["_id"],
     getComponents: [],
     getComponent: ["slug"],
+    deleteComponent: ["slug", "componentName"],
     setPage: ["slug", "body"],
     searchProduct: ["query"],
   };
@@ -155,6 +156,20 @@ class Api {
   }
   async getComponent(slug: string) {
     const result = await Component.findOne({ slug });
+
+    return result;
+  }
+  async deleteComponent(slug: string, componentName: string) {
+    const result = await Component.findOneAndUpdate(
+      { slug }, // Filter by slug
+      { $unset: { [`component_props.${componentName}`]: "" } }, // Remove the specified component
+      { new: true } // Return the updated document
+    );
+
+    if (!result) {
+      console.log(`No component found with slug: ${slug}`);
+      return null;
+    }
 
     return result;
   }

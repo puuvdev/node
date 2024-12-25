@@ -435,6 +435,7 @@ class Auth {
 
     return { message: "Notification removed successfully", success: true };
   }
+
   async getUnreadNotificationCount(userId: string, access_token: string) {
     const userIdFromToken = await this.verifyToken(access_token);
 
