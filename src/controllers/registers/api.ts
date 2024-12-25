@@ -160,18 +160,31 @@ class Api {
     return result;
   }
   async deleteComponent(slug: string, componentName: string) {
-    const result = await Component.findOneAndUpdate(
-      { slug }, // Filter by slug
-      { $unset: { [`component_props.${componentName}`]: "" } }, // Remove the specified component
-      { new: true } // Return the updated document
-    );
+    try {
+      await Page.findOneAndUpdate(
+        { slug },
+        { $pull: { components: componentName } }, // Remove the specified component
+        { new: true }
+      );
+      const result = await Page.findOneAndUpdate(
+        { slug }, // Filter by slug
+        {
+          $unset: {
+            [`components_props.${componentName}`]: "",
+          },
+        }, // Remove the specified component
+        { new: true } // Return the updated document
+      );
 
-    if (!result) {
-      console.log(`No component found with slug: ${slug}`);
-      return null;
+      if (!result) {
+        console.log(`No component found with slug: ${slug}`);
+        return null;
+      }
+
+      return result;
+    } catch (error) {
+      console.log(error);
     }
-
-    return result;
   }
   async getVariants(ids: number[]) {
     const result = await Product.find({ providerId: { $in: ids } });
