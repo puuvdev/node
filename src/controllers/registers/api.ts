@@ -42,6 +42,7 @@ class Api {
     getComponents: [],
     getComponent: ["slug"],
     deleteComponent: ["slug", "componentName"],
+    updateComponent: ["slug", "props", "name"],
     setPage: ["slug", "body"],
     searchProduct: ["query"],
   };
