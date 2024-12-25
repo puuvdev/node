@@ -159,6 +159,18 @@ class Api {
 
     return result;
   }
+
+  async updateComponent(slug: string, props: any, name: string) {
+    try {
+      await Page.findOneAndUpdate(
+        { slug },
+        { $set: { [`components_props.${name}`]: props } }
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   async deleteComponent(slug: string, componentName: string) {
     try {
       await Page.findOneAndUpdate(
@@ -186,6 +198,7 @@ class Api {
       console.log(error);
     }
   }
+
   async getVariants(ids: number[]) {
     const result = await Product.find({ providerId: { $in: ids } });
 
