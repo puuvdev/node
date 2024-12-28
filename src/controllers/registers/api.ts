@@ -113,7 +113,7 @@ class Api {
   }
   async getPageMenu(slug: string) {
     try {
-      const parentMenus = await MenuItem.find({ ebeveyn: null }).exec();
+      const parentMenus = await MenuItem.find({ ebeveyn: null, slug }).exec();
 
       // Step 2: For each parent menu, fetch its nested sub-items
       const menusWithSubItems = await Promise.all(
