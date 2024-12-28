@@ -7,6 +7,7 @@ import Page from "../../models/Page";
 import Component from "../../models/Component";
 import MenuItem, { MenuItemInterface } from "../../models/MenuItem";
 import { Types } from "mongoose";
+import Menu from "../../models/Menu";
 
 export const stringToObjectId = (id: string): Types.ObjectId => {
   console.log(id, "id");
@@ -113,7 +114,13 @@ class Api {
   }
   async getPageMenu(slug: string) {
     try {
-      const parentMenus = await MenuItem.find({ ebeveyn: null, slug }).exec();
+      const menu = await Menu.findOne({ slug }).exec();
+      if (!menu) return [];
+
+      const parentMenus = await MenuItem.find({
+        ebeveyn: null,
+        menu_id: menu._id,
+      }).exec();
 
       // Step 2: For each parent menu, fetch its nested sub-items
       const menusWithSubItems = await Promise.all(
